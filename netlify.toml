@@ -1,0 +1,53 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Force HTTPS redirect
+[[redirects]]
+  from = "http://your-site-name.netlify.app/*"
+  to = "https://your-site-name.netlify.app/:splat"
+  status = 301
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Enhanced security headers
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self' https://*.supabase.co https://*.voiceflow.com https://cdn.voiceflow.com https://*.stripe.com https://js.stripe.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.voiceflow.com https://js.stripe.com https://*.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.unsplash.com https://*.pexels.com https://*.supabase.co https://*.stripe.com; connect-src 'self' https://*.supabase.co https://*.voiceflow.com wss://*.supabase.co https://*.stripe.com https://api.stripe.com; font-src 'self' data:; frame-src https://js.stripe.com https://hooks.stripe.com;"
+    # Force HTTPS
+    X-Forwarded-Proto = "https"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache images
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
