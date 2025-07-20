@@ -1,0 +1,44 @@
+/*
+  # Create voice_samples table for Phase 0 Compliance
+*/
+
+CREATE TABLE IF NOT EXISTS voice_samples (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  tone_type text NOT NULL,
+  file_url text NOT NULL,
+  filename text NOT NULL,
+  duration integer,
+  file_size integer,
+  timestamp timestamptz DEFAULT now(),
+  UNIQUE(user_id, tone_type)
+);
+
+-- Enable Row Level Security
+ALTER TABLE voice_samples ENABLE ROW LEVEL SECURITY;
+
+-- Policies
+CREATE POLICY "Users can view their own voice samples"
+  ON voice_samples FOR SELECT TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own voice samples"
+  ON voice_samples FOR INSERT TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own voice samples"
+  ON voice_samples FOR UPDATE TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own voice samples"
+  ON voice_samples FOR DELETE TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Service role can manage all voice samples"
+  ON voice_samples FOR ALL TO service_role
+  USING (true) WITH CHECK (true);
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_voice_samples_user_id ON voice_samples(user_id);
+CREATE INDEX IF NOT EXISTS idx_voice_samples_tone_type ON voice_samples(tone_type);
+CREATE INDEX IF NOT EXISTS idx_voice_samples_user_tone ON voice_samples(user_id, tone_type);

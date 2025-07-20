@@ -1,3 +1,6 @@
+[dev]
+  command = "npm run dev"
+
 # test change
 [build]
   command = "npm run build"
